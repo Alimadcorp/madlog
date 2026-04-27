@@ -1,6 +1,6 @@
-class Madlogger {
+class MadlogClient {
   constructor(channel = 'none', testMode = false, mode = "default") {
-    this.url = 'https://madlog.vercel.app/api';
+    this.url = 'https://log.alimad.co/api';
     this.testMode = testMode;
     this.channel = channel;
     if (mode == "silent") {
@@ -68,81 +68,6 @@ class Madlogger {
       if (!this.silent || this.testMode)
         console.warn('Failed to pull logs', e);
       return null;
-    }
-  }
-  async getNewLogs(channel = this.channel) {
-    const endpoint = `${this.url}/new`;
-    const params = new URLSearchParams({
-      channel
-    });
-    const url = `${endpoint}?${params.toString()}`;
-    if (this.testMode) {
-      console.log('Getting new logs from', url);
-    }
-    try {
-      const response = await fetch(url);
-      if (this.testMode) {
-        console.log('New logs', response);
-      }
-      if (!response.ok) {
-        return null;
-      }
-      return await response.json();
-    } catch (e) {
-      if (!this.silent || this.testMode)
-        console.warn('Failed to get new logs', e);
-      return null;
-    }
-  }
-  async subscribe(channel = this.channel, onMessage) {
-    const endpoint = `${this.url}/subscribe`;
-    const params = new URLSearchParams({
-      channel
-    });
-    const url = `${endpoint}?${params.toString()}`;
-    if (this.testMode) {
-      console.log('Subscribing to', url);
-    }
-    try {
-      const eventSource = new EventSource(url);
-      eventSource.onmessage = (event) => {
-        if (this.testMode) {
-          console.log('Received message', event.data);
-        }
-        if (onMessage) {
-          onMessage(JSON.parse(event.data));
-        }
-      };
-      eventSource.onerror = (e) => {
-        console.warn('Subscription error', e);
-        eventSource.close();
-      };
-      return eventSource;
-    } catch (e) {
-      if (!this.silent || this.testMode)
-        console.warn('Failed to subscribe', e);
-      return null;
-    }
-  }
-  async unsubscribe(channel = this.channel) {
-    const endpoint = `${this.url}/unsubscribe`;
-    const params = new URLSearchParams({
-      channel
-    });
-    const url = `${endpoint}?${params.toString()}`;
-    if (this.testMode) {
-      console.log('Unsubscribing from', url);
-    }
-    try {
-      const response = await fetch(url);
-      if (this.testMode) {
-        console.log('Unsubscribed', response);
-      }
-      return response.ok;
-    } catch (e) {
-      if (!this.silent || this.testMode)
-        console.warn('Failed to unsubscribe', e);
-      return false;
     }
   }
   async getCountry() {
